@@ -12,7 +12,7 @@ typedef struct Producto {
 
 typedef struct Usuario {
     char nombre[50];
-    char numeroCelular[11];  // 10 dígitos + 1 para '\0'
+    char numeroCelular[10];
     float totalPagar;
     Producto* carrito;
 } Usuario;
