@@ -1,0 +1,7 @@
+CocaCola 16.3
+Café 80.0
+Galletas 19.0
+Queso 35.9
+Shampoo 49.0
+Jabon 28.5
+Vino 234.0
