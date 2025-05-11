@@ -64,7 +64,7 @@ Producto* cargarProductos(const char* archivo) {
 // Mostrar prodcucto
 void mostrarProducto(Producto* p) {
     printf("Nombre: %s\n", p->nombre);
-    printf("Precio: %.2f\n", p->precio);
+    printf("Precio: $%.2f\n", p->precio);
 }
 
 
@@ -91,6 +91,25 @@ void agregarAlCarrito(Usuario* usuario, Producto* productoActual) {
     printf("Producto agregado al carrito: %s (%.2f)\n", nuevo->nombre, nuevo->precio);
     getchar(); getchar();
 } 
+
+void mostrarCarrito(Usuario usuario) {
+    if (usuario.carrito == NULL) {
+        printf("Tu carrito de compras está vacío.\n");
+        printf("Puedes volver al menú y agregar productos con la opción 3.\n");
+    } else {
+        printf("=== Carrito de Compras ===\n");
+        Producto* actual = usuario.carrito;
+        int contador = 1;
+        while (actual != NULL) {
+            printf("%d. %s - $%.2f\n", contador, actual->nombre, actual->precio);
+            actual = actual->siguiente;
+            contador++;
+        }
+        printf("\nTotal a pagar: $%.2f\n", usuario.totalPagar);
+    }
+    getchar(); getchar();
+}
+
 
 // Menú de navegación
 void navegarProductos(Producto* actual, Usuario* usuario) {
@@ -135,7 +154,7 @@ Usuario crearUsuario() {
     printf("Ingresa tu nombre: ");
     scanf(" %[^\n]", u.nombre);  // lee espacios hasta Enter
     printf("Ingresa tu número celular (10 dígitos): ");
-    scanf(" %10s", u.numeroCelular);  // hasta 10 caracteres (seguro)
+    scanf(" %10s", u.numeroCelular);  // hasta 10 caracteres
 
     u.totalPagar = 0.0;
     u.carrito = NULL;
@@ -149,7 +168,7 @@ Usuario crearUsuario() {
 void mostrarUsuario(Usuario u) {
     printf("Nombre: %s\n", u.nombre);
     printf("Número: %s\n", u.numeroCelular);
-    printf("Total a pagar: %.2f\n", u.totalPagar);
+    printf("Total a pagar: $%.2f\n", u.totalPagar);
 }
 
 
@@ -183,8 +202,7 @@ int main() {
 
         switch (opcion) {
             case 1:
-                printf("Aqui va el carrito de compras.\n");
-                getchar(); getchar();
+                mostrarCarrito(usuario);
                 break;
 
             case 2:
