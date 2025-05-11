@@ -17,6 +17,7 @@ typedef struct Usuario {
     Producto* carrito;
 } Usuario;
 
+
 // Gestión de productos
 
 Producto* crearProducto(char* nombre, float precio) {
@@ -66,11 +67,37 @@ void mostrarProducto(Producto* p) {
     printf("Precio: %.2f\n", p->precio);
 }
 
-void navegarProductos(Producto* actual) {
+
+void agregarAlCarrito(Usuario* usuario, Producto* productoActual) {
+    // Nuevo nodo con la información del producto actual
+    Producto* nuevo = (Producto*)malloc(sizeof(Producto));
+    if (nuevo == NULL) {
+        printf("Error al asignar memoria para el carrito.\n");
+        exit(1);
+    }
+
+    strcpy(nuevo->nombre, productoActual->nombre); // copiar el nombre
+    nuevo->precio = productoActual->precio; // copiar precio
+    nuevo->siguiente = usuario->carrito; // enlazar el nuevo nodo al inicio del carrito
+    nuevo->anterior = NULL;
+
+    if (usuario->carrito != NULL) {
+        usuario->carrito->anterior = nuevo;
+    }
+
+    usuario->carrito = nuevo;  // el carrito empieza cpn ese producto
+    usuario->totalPagar += nuevo->precio; // lo suma al total
+
+    printf("Producto agregado al carrito: %s (%.2f)\n", nuevo->nombre, nuevo->precio);
+    getchar(); getchar();
+} 
+
+// Menú de navegación
+void navegarProductos(Producto* actual, Usuario* usuario) {
     char tecla;
     while (1) {
         system("clear");
-        printf("Presiona 'S' para siguiente, 'A' para anterior, 'Q' para salir.\n");
+        printf("Presiona 'S' para siguiente, 'A' para anterior, 'C' para agregar al carrito, 'Q' para salir.\n");
         mostrarProducto(actual);
 
         scanf(" %c", &tecla);
@@ -88,6 +115,9 @@ void navegarProductos(Producto* actual) {
             } else {
                 printf("Ya estás en el primer producto.\n");
                 getchar(); getchar(); 
+            }
+        } else if (tecla == 'C' || tecla == 'c') {
+                agregarAlCarrito(usuario, actual); {
             }
         } else if (tecla == 'Q' || tecla == 'q') {
             break;
@@ -163,7 +193,7 @@ int main() {
                 break;
 
             case 3:
-                navegarProductos(actual);
+                navegarProductos(actual, &usuario);
                 break;
 
             case 4:
