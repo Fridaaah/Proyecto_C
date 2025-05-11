@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+// Estructuras
 typedef struct Producto {
     char nombre[50];
     float precio;
@@ -9,7 +10,15 @@ typedef struct Producto {
     struct Producto* anterior; // Apuntador al producto anterior
 } Producto;
 
-// Nodo de producto
+typedef struct Usuario {
+    char nombre[50];
+    char numeroCelular[11];  // 10 dígitos + 1 para '\0'
+    float totalPagar;
+    Producto* carrito;
+} Usuario;
+
+// Gestión de productos
+
 Producto* crearProducto(char* nombre, float precio) {
     Producto* nuevo = (Producto*)malloc(sizeof(Producto));
     if (nuevo == NULL) {
@@ -57,16 +66,8 @@ void mostrarProducto(Producto* p) {
     printf("Precio: %.2f\n", p->precio);
 }
 
-// Menú principal
-int main() {
-    Producto* actual = cargarProductos("productos.txt");
+void navegarProductos(Producto* actual) {
     char tecla;
-
-    if (actual == NULL) {
-        printf("No se cargaron productos.\n");
-        return 1;
-    }
-    
     while (1) {
         system("clear");
         printf("Presiona 'S' para siguiente, 'A' para anterior, 'Q' para salir.\n");
@@ -92,17 +93,96 @@ int main() {
             break;
         }
     }
+}
 
-    // Liberar la memoria
-    Producto* temp;
-    while (actual->anterior != NULL) {
-        actual = actual->anterior;
-    }
-    while (actual != NULL) {
-        temp = actual;
-        actual = actual->siguiente;
-        free(temp);
-    }
+// Gestion de usuario
 
-    return 0;
+Usuario crearUsuario() {
+    Usuario u;
+
+    printf("=== Registro de usuario ===\n");
+
+    printf("Ingresa tu nombre: ");
+    scanf(" %[^\n]", u.nombre);  // lee espacios hasta Enter
+    printf("Ingresa tu número celular (10 dígitos): ");
+    scanf(" %10s", u.numeroCelular);  // hasta 10 caracteres (seguro)
+
+    u.totalPagar = 0.0;
+    u.carrito = NULL;
+
+    printf("\n¡Registro exitoso!\n");
+    getchar(); getchar();  // pausa para leer
+
+    return u;
+}
+
+void mostrarUsuario(Usuario u) {
+    printf("Nombre: %s\n", u.nombre);
+    printf("Número: %s\n", u.numeroCelular);
+    printf("Total a pagar: %.2f\n", u.totalPagar);
+}
+
+
+// Menú principal
+
+void mostrarMenu() {
+    printf("=== Menú Principal ===\n");
+    printf("1. Ver mi carrito de compras\n");
+    printf("2. Ver mi información de usuario\n");
+    printf("3. Ver la lista de productos\n");
+    printf("4. Salir\n");
+}
+
+
+int main() {
+    Producto* inicio = cargarProductos("productos.txt");
+    Producto* actual = inicio; 
+    Producto* temp; 
+    Usuario usuario = crearUsuario();
+    int opcion;
+
+    if (actual == NULL) {
+        printf("No se cargaron productos.\n");
+        return 1;
+    }
+    
+    while (1) {
+        system("clear");
+        mostrarMenu();
+        scanf("%d", &opcion);
+
+        switch (opcion) {
+            case 1:
+                printf("Aqui va el carrito de compras.\n");
+                getchar(); getchar();
+                break;
+
+            case 2:
+                mostrarUsuario(usuario);
+                getchar(); getchar();
+                break;
+
+            case 3:
+                navegarProductos(actual);
+                break;
+
+            case 4:
+                printf("Saliendo de la tiendita...\n");
+                
+                
+                // Liberar memoria
+                Producto* temp;
+                while (inicio != NULL) {
+                    temp = inicio;
+                    inicio = inicio->siguiente;
+                    free(temp);
+                }
+                return 0;
+
+            default:
+                printf("Opción no válida.\n");
+                getchar(); getchar();
+                break;
+        }
+    }
 }
