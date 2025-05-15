@@ -1,0 +1,315 @@
+\documentclass{article}
+\clearpage
+
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx} % Required for inserting images
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage[spanish]{babel}
+\usepackage{float}
+\usepackage{hyperref}
+
+\title{Proyecto Final C}
+\author{Frida Hernández Rodríguez y Cristopher Velasco Ávila}
+\date{Mayo 2025}
+
+\begin{document}
+
+\maketitle
+\pagebreak
+\tableofcontents
+\pagebreak
+\section{Introducción}
+El presente proyecto fue desarrollado como parte del curso de lenguaje C. El objetivo principal fue implementar un sistema interactivo de compras que simulara el funcionamiento básico de una tiendita virtual. Para ello, se emplearon estructuras, listas ligadas, manejo de archivos y entrada por teclado, así como memoria dinámica mediante el uso de punteros.
+
+El programa permite al usuario registrar su nombre y número celular, navegar una lista de productos cargados desde un archivo .txt, agregar productos a su carrito de compras y visualizar tanto su información personal como el contenido del carrito y el total acumulado a pagar. Todo esto se organiza a través de un menú principal que facilita la interacción con el sistema.
+
+La lógica del sistema se basa en el uso de listas doblemente ligadas para representar tanto el inventario de productos como el carrito del usuario, permitiendo recorrer los elementos hacia adelante y hacia atrás, y realizar operaciones dinámicas de forma eficiente.
+
+
+
+\pagebreak
+  \section{Desarrollo}
+   \subsection{Definición de Estructuras}
+   En este proyecto se definen dos estructuras fundamentales: \texttt{Producto} y \texttt{Usuario}. Estas estructuras sirven como molde para crear nodos en listas ligadas que almacenan información relevante del sistema (productos y datos del cliente).
+
+   \texttt{Producto} representa un nodo de la lista de productos (y también del carrito del usuario). Contiene:
+\begin{itemize}
+    \item \textbf{} nombre: el nombre del producto, como cadena de caracteres.
+
+\item \textbf{} precio: el precio en formato decimal.
+
+\item \textbf{} siguiente: puntero al siguiente nodo de la lista (enlace hacia adelante).
+
+\item \textbf{} anterior: puntero al nodo anterior (enlace hacia atrás).
+\end{itemize}
+Esta forma de enlazarlos hace que la lista sea doblemente ligada, lo cual permite recorrerla en ambas direcciones (adelante y atrás).
+
+\texttt{Usuario} representa al cliente que está usando el sistema. Contiene:
+\begin{itemize}
+\item \textbf{} nombre: el nombre del usuario.
+
+\item \textbf{} numeroCelular: su número telefónico (10 dígitos).
+
+\item \textbf{} totalPagar: la suma total de los precios de los productos que ha agregado al carrito.
+
+\item \textbf{} Producto* carrito: un puntero que apunta al inicio de la lista ligada.
+\end{itemize}
+\subsubsection{Imagen del código}
+
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=0.7\textwidth]{estructuras.png}
+\caption{Estructura Producto y Usuario}
+\end{figure}
+
+
+   \subsection{Función: \texttt{crearProducto()}}
+   En esta sección explicaremos detalladamente la función crearProducto. 
+   
+   \texttt{Producto*}: esta función devuelve un puntero a un Producto. 
+   
+   \texttt{crearProducto} : nombre de la función. \texttt{char* nombre}: recibe una cadena (nombre del producto) como parámetro. 
+   
+   \texttt{float precio}: recibe el precio del producto como parámetro. 
+   
+   \texttt{Producto* nuevo}: se declara el puntero \texttt{nuevo} a la estructura/nodo \texttt{Producto}. \texttt{malloc(sizeof(Producto))}: se reserva memoria en el heap suficiente para un producto. \texttt{(Producto*)}: se hace un cast explícito para convertir lo que devuelve \texttt{malloc()} a tipo \texttt{Producto*}. Se verifica si \texttt{malloc()} no pudo reservar memoria. Si es así, se imprime un error y se termina el programa con \texttt{exit(1)}.
+
+Despues, se copia el contenido de la cadena \texttt{nombre} dentro del campo \texttt{nombre} del nodo \texttt{nuevo}. En seguida, se copia el valor del parámetro \texttt{precio} al campo \texttt{precio} del nodo \texttt{nuevo}.
+Luego, se inicializa el puntero \texttt{siguiente} del nodo \texttt{nuevo} como NULL porque en el momento en que se crea el nodo, todavía no se sabe con qué nodo lo vamos a enlazar.
+Con el puntero \texttt{anterior} haces lo mismo que con el puntero \texttt{siguiente}. Esto permite que nos podamos mover hacia adelante y hacia atras. Y \texttt{return nuevo;} devuelve el puntero \texttt{nuevo} al nodo acabamos de crear. 
+
+\subsubsection{Imagen del código}
+
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=0.7\textwidth]{crearProd.png}
+\caption{Imagen del código}
+\end{figure}
+
+\pagebreak
+   \subsection{Función: \texttt{cargarProductos()}}
+   Lee línea por línea un archivo .txt que contiene productos. Por cada línea, crea un nodo con \texttt{crearProducto()} y lo agrega al final de una lista doblemente ligada. La variable \texttt{inicio} almacena el primer nodo de la lista (la cabeza), y \texttt{anterior} se usa para enlazar los nodos sucesivos. Al final, la función retorna el inicio de la lista de productos.
+
+   \subsubsection{Imagen del código}
+
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=0.7\textwidth]{cargarProd.png}
+\caption{Imagen del código}
+\end{figure}
+   
+   \subsection{Función: \texttt{mostrarProducto()}}
+   Recibe un puntero a un nodo de producto y muestra su nombre y precio en consola. Se usa dentro de la navegación de productos para mostrar el nodo actual.
+
+\pagebreak
+   \subsubsection{Imagen del código}
+   
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=0.7\textwidth]{mostrarProd.png}
+\caption{Imagen del código}
+\end{figure}
+   
+   \subsection{Función: \texttt{agregarAlCarrito()}}
+   Crea un nuevo nodo copiando los datos del \texttt{productoActual} (el nodo que el usuario está viendo en la tienda). Inserta ese nuevo nodo al inicio de la lista \texttt{usuario->carrito}, y además incrementa el total a pagar. Esta función permite que el carrito tenga su propia lista de productos sin afectar la lista principal.
+
+   \subsubsection{Imagen del código}
+   
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=0.7\textwidth]{agregarAlCarrito.png}
+\caption{Imagen del código}
+\end{figure}
+
+   \subsection{Función: \texttt{mostrarCarrito()}}
+   Muestra el contenido del carrito del usuario recorriendo la lista ligada \texttt{usuario.carrito}. Imprime todos los productos con su nombre, precio y un contador, seguido del total acumulado. Si el carrito está vacío, muestra un mensaje.
+
+   \subsubsection{Imagen del código}
+   
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=0.7\textwidth]{mostrarCarrito.png}
+\caption{Imagen del código}
+\end{figure}
+   
+   \subsection{Función: \texttt{navegarProductos()}}
+   Permite recorrer la lista de productos uno por uno. Usa teclas:
+\begin{itemize}
+    \item \textbf{S}: para ir al siguiente nodo
+
+    \item \textbf{A}: para ir al anterior
+
+    \item \textbf{C}: para agregar el producto al carrito
+
+    \item \textbf{Q}: para regresar al menú principal
+\end{itemize}
+
+Se utiliza un ciclo infinito \texttt{(while(1))} hasta que se presione 'Q'. El nodo actual se va actualizando con \texttt{actual = actual->siguiente} o \texttt{actual->anterior}.
+
+   \subsubsection{Imagen del código}
+   
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=0.7\textwidth]{navegarProd.png}
+\caption{Imagen del código}
+\end{figure}
+   
+   \pagebreak
+   \subsection{Función: \texttt{crearUsuario()}}
+   Solicita al usuario su nombre y número celular. Luego inicializa el total a pagar en cero y el carrito en \texttt{NULL}. Devuelve la estructura \texttt{Usuario} ya inicializada. Se ejecuta una sola vez al inicio del programa.
+
+   \subsubsection{Imagen del código}
+   
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=0.7\textwidth]{crearUsu.png}
+\caption{Imagen del código}
+\end{figure}
+
+   \subsection{Función: \texttt{mostrarUsuario()}}
+   Esta función sirve para mostrar a información del usuario registrado. Recibe una copia de la estructura \texttt{Usuario} como parámetro (no es necesario modificarlo, por eso no se pasa por puntero). Imprime tres campos del usuario: \texttt{u.nombre}: la cadena con el nombre del usuario. \texttt{u.numeroCelular}: el número que ingresó al principio del programa. \texttt{u.totalPagar}: el total acumulado por los productos agregados al carrito, mostrado con dos decimales. Esta función se usa cuando el usuario elige la opción 2 del menú principal.
+
+   \subsubsection{Imagen del código}
+   
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=0.7\textwidth]{mostrarUsua.png}
+\caption{Imagen del código}
+\end{figure}
+
+   \subsection{Función: \texttt{mostrarMenu()}}
+  Muestra el menú principal del programa. Es una función muy sencilla pero muy útil, porque centraliza la impresión del menú, haciendo que el \texttt{main()} sea más limpio y más fácil de leer. Cada printf imprime una línea con una opción. Cuando se muestra este menú, el programa espera que el usuario ingrese un número del 1 al 4, que se leerá después en el \texttt{main()}.
+
+   \subsubsection{Imagen del código}
+   
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=0.7\textwidth]{mostrarMenu.png}
+\caption{Imagen del código}
+\end{figure} 
+
+   \subsection{Función Principal: \texttt{main()}}
+   Es el punto de entrada del programa. Aquí se realiza lo siguiente:
+\begin{itemize}
+    \item \textbf{} Se carga la lista de productos desde productos.txt.
+
+\item \textbf{}Se crea el usuario.
+
+\item \textbf{}Se entra en un ciclo que muestra el menú principal.
+
+\item \textbf{}Dependiendo de la opción elegida:
+
+Se muestra el carrito.
+
+Se muestra la información del usuario.
+
+Se navega por los productos.
+
+Se sale del programa.
+\end{itemize}
+Antes de salir, libera la memoria de la lista de productos usando un ciclo con \texttt{free()}.
+
+   \subsubsection{Imagen del código}
+   
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=0.7\textwidth]{main.png}
+\caption{Imagen del código}
+\end{figure}
+\pagebreak
+
+\pagebreak
+\section{Ejecución}
+\pagebreak
+\subsection{Registro de Usuario}
+  
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=0.7\textwidth]{RegistroUsuario.png}
+\caption{Imagen de la ejecución}
+\end{figure}
+
+\subsection{Menú Principal}
+   
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=0.7\textwidth]{MenuPrincipal.png}
+\caption{Imagen de la ejecución}
+\end{figure}
+
+\subsection{Ver mi carrito de compras - cuando está vacio}
+  
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=0.7\textwidth]{CarritoVacio.png}
+\caption{Imagen de la ejecución}
+\end{figure}
+\pagebreak
+\subsection{Ver lista de productos}
+  
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=0.7\textwidth]{Lista de prod.png}
+\caption{Imagen de la ejecución}
+\end{figure}
+
+\subsection{Ultimo producto de la lista}
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=0.7\textwidth]{YaEstasUltimoProducto.png}
+\caption{Imagen de la ejecución}
+\end{figure}
+
+\subsection{Agregar al carrito}
+  
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=0.7\textwidth]{agregadoalcarrito.png}
+\caption{Imagen de la ejecución}
+\end{figure}
+
+
+\subsection{Ver mi carrito de compras - con productos}
+
+  \begin{figure}[!ht]
+\centering
+\includegraphics[width=0.7\textwidth]{CarritoConProdYTotal.png}
+\caption{Imagen de la ejecución}
+\end{figure}
+\pagebreak
+\subsection{Ver mi información de usuario}
+
+ \begin{figure}[!ht]
+\centering
+\includegraphics[width=0.7\textwidth]{Info de Usuario.png}
+\caption{Imagen de la ejecución}
+\end{figure}
+
+  \subsection{Salir de la tiendita}
+
+ \begin{figure}[!ht]
+\centering
+\includegraphics[width=0.7\textwidth]{SalirTiendita.png}
+\caption{Imagen de la ejecución}
+\end{figure}
+
+\pagebreak
+\section{Conclusiones}
+\subsection{Conclusión de Frida}
+
+Este proyecto representó un gran reto y, al mismo tiempo, una excelente oportunidad para poner en práctica varios de los conceptos que aprendimos durante el curso, especialmente aquellos que al inicio me parecían abstractos, como las listas ligadas, los nodos, el manejo de memoria dinámica y el uso de estructuras con punteros.
+
+Una de las partes más complejas fue entender cómo se conectan los nodos dentro de una lista doblemente ligada y por qué es necesario crear copias cuando se manejan listas separadas, como en el caso del carrito de compras
+
+Otro aspecto valioso fue aprender la importancia de liberar correctamente la memoria, una tarea que muchas veces se pasa por alto, pero que es crucial para evitar errores a largo plazo. Comprendí cómo se reserva y se libera memoria manualmente en C.
+
+En general, este proyecto me ayudó a desarrollar habilidades técnicas, de organización del código y de pensamiento lógico. Más allá de cumplir con los requerimientos, me permitió experimentar, equivocarme, corregir y comprender mejor cómo se construyen programas que no solo funcionan, sino que tienen sentido estructuralmente. Sin duda, me deja mejor preparada para seguir aprendiendo C y enfrentar proyectos más complejos en el futuro.
+
+\subsection{Conclusión de Cristopher}
+
+Este proyecto me ayudó a reforzar varios conceptos importantes de programación en C, especialmente el uso de estructuras, punteros y listas ligadas. Fue interesante ver cómo todo lo que aprendimos en clase puede aplicarse a algo tan concreto como simular una tiendita, donde los datos se almacenan, se recorren y se modifican dinámicamente. Comprender cómo se conectan los nodos, cómo se construye una lista doblemente ligada y cómo se maneja la memoria me permitió avanzar mucho en mi comprensión del lenguaje.
+
+Al mismo tiempo, este proyecto representó un reto importante a nivel de organización personal y trabajo en equipo. Estando cerca del final del semestre, con otras entregas y exámenes encima, fue necesario aprender a priorizar, distribuir tiempos y colaborar de forma clara para cumplir con lo acordado. Aunque hubo momentos de presión, logramos avanzar y terminar el proyecto de manera funcional, lo cual me deja satisfecho tanto por lo aprendido como por el compromiso que implicó sacarlo adelante en conjunto.
+
+\end{document}
